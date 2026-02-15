@@ -1,7 +1,8 @@
 import os
 from openai import OpenAI
 
-client = OpenAI(api_key="PASTE YOUR API KEY HERE")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
 
 
 def ask_ai(question: str) -> str:
