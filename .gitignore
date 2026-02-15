@@ -1,0 +1,23 @@
+# Python virtual environment
+venv/
+
+# Environment variables (API keys)
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# VS Code
+.vscode/
+
+
+# OS files
+.DS_Store
+Thumb.db
+
+#Logs
+Logs
+*.log
