@@ -5,138 +5,145 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>AI Response Evaluator</title>
   <style>
+    :root { color-scheme: dark; }
     body {
       margin: 0;
-      padding: 24px;
-      min-height: 100vh;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       background: #0b1220;
-      color: #e6e6e6;
+      color: #e8eefc;
     }
-
-    .card {
+    .wrap {
       max-width: 900px;
-      margin: 0 auto;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      margin: 40px auto;
+      padding: 24px;
     }
-
-    h1 { margin: 0 0 12px; font-size: 26px; }
-    label { display:block; margin: 12px 0 6px; font-size: 14px; opacity: 0.9; }
-
+    h1 { margin: 0 0 8px; }
+    p.sub { margin: 0 0 18px; color: #b9c6e6; }
+    .card {
+      background: #0f1a33;
+      border: 1px solid #1f2a4b;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    label { display: block; margin: 12px 0 6px; color: #b9c6e6; }
     textarea, input, select {
       width: 100%;
       box-sizing: border-box;
-      padding: 10px;
+      padding: 10px 12px;
       border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.18);
-      background: rgba(0,0,0,0.25);
-      color: #e6e6e6;
+      border: 1px solid #2a3a66;
+      background: #0b132a;
+      color: #e8eefc;
       outline: none;
     }
-
     textarea { min-height: 90px; resize: vertical; }
-
     .row {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
-    }
-
-    .btn {
-      margin-top: 12px;
-      background: #2ecc71;
-      color: #0b1220;
-      border: 0;
-      padding: 10px 14px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 700;
-    }
-
-    .muted { opacity: 0.8; font-size: 13px; }
-
-    .history {
-      margin-top: 18px;
-      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 12px;
     }
-
-    .item {
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(0,0,0,0.22);
-      border-radius: 14px;
-      padding: 12px;
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
     }
-
-    .item h3 { margin: 0 0 8px; font-size: 16px; }
-    .pill {
-      display:inline-block;
-      padding: 3px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.18);
-      margin-right: 6px;
-      font-size: 12px;
-      opacity: 0.95;
-    }
-
-    pre {
-      white-space: pre-wrap;
-      background: rgba(255,255,255,0.05);
-      padding: 10px;
+    button {
+      padding: 10px 14px;
       border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.12);
-      margin: 8px 0 0;
+      border: 1px solid #2a3a66;
+      background: #13224a;
+      color: #e8eefc;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button.primary {
+      background: #22c55e;
+      border-color: #22c55e;
+      color: #06120a;
+    }
+    button:disabled { opacity: .6; cursor: not-allowed; }
+    .status { margin-top: 10px; color: #b9c6e6; }
+    .history-item {
+      border-top: 1px solid #1f2a4b;
+      padding-top: 12px;
+      margin-top: 12px;
+    }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .pill {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      border: 1px solid #2a3a66;
+      color: #b9c6e6;
+      font-size: 12px;
+      margin-right: 6px;
+    }
+    .answer {
+      margin-top: 8px;
+      padding: 10px 12px;
+      background: #0b132a;
+      border: 1px solid #2a3a66;
+      border-radius: 10px;
+      white-space: pre-wrap;
     }
   </style>
 </head>
+
 <body>
-  <div class="card">
+  <div class="wrap">
     <h1>AI Response Evaluator</h1>
-    <div class="muted">Ask a question, then score the response. Saved results show below.</div>
+    <p class="sub">Ask a question, then score the response. Saved results show below. (No DB yet — in-memory only.)</p>
 
-    <label for="question">Question</label>
-    <textarea id="question" placeholder="Ask something..."></textarea>
+    <div class="card">
+      <label for="question">Question</label>
+      <textarea id="question" placeholder="Ask something..."></textarea>
 
-    <div class="row">
-      <div>
-        <label for="correctness">Correctness (1–5)</label>
-        <select id="correctness">
-          <option value="5">5 (Excellent)</option>
-          <option value="4">4</option>
-          <option value="3">3</option>
-          <option value="2">2</option>
-          <option value="1">1 (Bad)</option>
-        </select>
+      <div class="row">
+        <div>
+          <label for="correctness">Correctness (1–5)</label>
+          <select id="correctness">
+            <option value="1">1 (Bad)</option>
+            <option value="2">2</option>
+            <option value="3" selected>3</option>
+            <option value="4">4</option>
+            <option value="5">5 (Great)</option>
+          </select>
+        </div>
+        <div>
+          <label for="clarity">Clarity (1–5)</label>
+          <select id="clarity">
+            <option value="1">1 (Confusing)</option>
+            <option value="2">2</option>
+            <option value="3" selected>3</option>
+            <option value="4">4</option>
+            <option value="5">5 (Very clear)</option>
+          </select>
+        </div>
       </div>
-      <div>
-        <label for="clarity">Clarity (1–5)</label>
-        <select id="clarity">
-          <option value="5">5 (Very clear)</option>
-          <option value="4">4</option>
-          <option value="3">3</option>
-          <option value="2">2</option>
-          <option value="1">1 (Confusing)</option>
-        </select>
+
+      <label for="hallucination">Hallucination?</label>
+      <select id="hallucination">
+        <option value="no" selected>No</option>
+        <option value="yes">Yes</option>
+      </select>
+
+      <label for="notes">Notes (optional)</label>
+      <input id="notes" placeholder="What was good/bad about it?" />
+
+      <div class="buttons">
+        <button class="primary" id="askSaveBtn">Ask + Save Evaluation</button>
+        <button id="exportBtn">Export JSON</button>
       </div>
-      <div>
-        <label for="hallucination">Hallucination?</label>
-        <select id="hallucination">
-          <option value="false">No</option>
-          <option value="true">Yes</option>
-        </select>
-      </div>
+
+      <div class="status" id="status"></div>
     </div>
 
-    <label for="notes">Notes (optional)</label>
-    <input id="notes" placeholder="What was good/bad about it?" />
-
-    <button class="btn" id="submitBtn">Ask + Save Evaluation</button>
-
-    <div class="history" id="history"></div>
+    <div class="card">
+      <h2 style="margin:0 0 10px;">History</h2>
+      <div id="history"></div>
+    </div>
   </div>
 
   <script>
@@ -147,27 +154,14 @@
     const clarityEl = document.getElementById("clarity");
     const hallucinationEl = document.getElementById("hallucination");
     const notesEl = document.getElementById("notes");
-    const submitBtn = document.getElementById("submitBtn");
+
+    const askSaveBtn = document.getElementById("askSaveBtn");
+    const exportBtn = document.getElementById("exportBtn");
+    const statusEl = document.getElementById("status");
     const historyEl = document.getElementById("history");
 
-    function itemHTML(r) {
-      return `
-        <div class="item">
-          <h3>#${r.id} <span class="muted">(${r.created_at})</span></h3>
-          <div>
-            <span class="pill">Correctness: ${r.correctness}/5</span>
-            <span class="pill">Clarity: ${r.clarity}/5</span>
-            <span class="pill">Hallucination: ${r.hallucination ? "YES" : "NO"}</span>
-          </div>
-          <div class="muted" style="margin-top:8px;"><b>Q:</b> ${escapeHtml(r.question)}</div>
-          <pre><b>A:</b> ${escapeHtml(r.answer)}</pre>
-          ${r.notes ? `<div class="muted" style="margin-top:8px;"><b>Notes:</b> ${escapeHtml(r.notes)}</div>` : ""}
-        </div>
-      `;
-    }
-
-    function escapeHtml(s) {
-      return (s ?? "")
+    function escapeHtml(str) {
+      return (str ?? "")
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
@@ -176,48 +170,99 @@
     }
 
     async function loadHistory() {
-      const res = await fetch(`${API_BASE}/evaluations`);
-      const data = await res.json();
-      historyEl.innerHTML = data.length
-        ? data.map(itemHTML).join("")
-        : `<div class="muted">No evaluations yet. Submit one above.</div>`;
+      const res = await fetch(`${API_BASE}/history`);
+      const items = await res.json();
+
+      if (!Array.isArray(items) || items.length === 0) {
+        historyEl.innerHTML = `<div class="mono" style="color:#b9c6e6;">No evaluations yet.</div>`;
+        return;
+      }
+
+      historyEl.innerHTML = items.map((x) => {
+        return `
+          <div class="history-item">
+            <div><span class="pill">Correctness: ${x.correctness}</span><span class="pill">Clarity: ${x.clarity}</span><span class="pill">Hallucination: ${x.hallucination ? "Yes" : "No"}</span></div>
+            <div style="margin-top:8px;"><b>Q:</b> ${escapeHtml(x.question)}</div>
+            <div class="answer"><b>A:</b>\n${escapeHtml(x.answer)}</div>
+            ${x.notes ? `<div style="margin-top:8px;"><b>Notes:</b> ${escapeHtml(x.notes)}</div>` : ""}
+          </div>
+        `;
+      }).join("");
     }
 
-    submitBtn.addEventListener("click", async () => {
+    async function askAndSave() {
       const question = questionEl.value.trim();
-      if (!question) return alert("Type a question first.");
+      if (!question) {
+        statusEl.textContent = "Please enter a question.";
+        return;
+      }
 
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Saving...";
+      askSaveBtn.disabled = true;
+      statusEl.textContent = "Asking AI + saving evaluation...";
+
+      const payload = {
+        question,
+        correctness: Number(correctnessEl.value),
+        clarity: Number(clarityEl.value),
+        hallucination: hallucinationEl.value === "yes",
+        notes: notesEl.value.trim()
+      };
 
       try {
-        const payload = {
-          question,
-          correctness: Number(correctnessEl.value),
-          clarity: Number(clarityEl.value),
-          hallucination: hallucinationEl.value === "true",
-          notes: notesEl.value.trim()
-        };
-
-        await fetch(`${API_BASE}/ask`, {
+        const res = await fetch(`${API_BASE}/evaluate`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+          body: JSON.stringify(payload)
         });
 
-        questionEl.value = "";
-        notesEl.value = "";
-        await loadHistory();
-      } catch (e) {
-        alert("Error calling API. Is FastAPI running on 127.0.0.1:8000 ?");
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Ask + Save Evaluation";
-      }
-    });
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error(`Backend error: ${res.status} ${txt}`);
+        }
 
+        await res.json();
+        statusEl.textContent = "Saved ✅";
+        await loadHistory();
+
+        // optional: clear notes after save (keep question so you can edit/retry)
+        // notesEl.value = "";
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "Error: " + err.message;
+      } finally {
+        askSaveBtn.disabled = false;
+      }
+    }
+
+    async function exportJson() {
+      statusEl.textContent = "Exporting JSON...";
+      try {
+        const res = await fetch(`${API_BASE}/history`);
+        const items = await res.json();
+
+        const blob = new Blob([JSON.stringify(items, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "ai-response-evaluations.json";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(url);
+        statusEl.textContent = "Exported ✅";
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "Export failed: " + err.message;
+      }
+    }
+
+    askSaveBtn.addEventListener("click", askAndSave);
+    exportBtn.addEventListener("click", exportJson);
+
+    // Load existing history on page load
     loadHistory();
   </script>
 </body>
 </html>
-
